@@ -38,6 +38,30 @@ public final class ConversionUtils {
     private ConversionUtils() {
         // hide
     }
+/** Added by Fari for #ps-2*/
+    public static String removeDash(String selection){
+        StringBuilder str = new StringBuilder();
+        String[] words  = splitAndTrim(selection,",");
+
+        for(int i = 0; i<words.length; i++){
+            if(words[i].contains("-")){
+                int index = words[i].indexOf("-");
+                String min = words[i].substring(0,index);
+                String max = words[i].substring(index+1, words[i].length());
+                System.out.println(max);
+
+                for (int j= Integer.parseInt(min); j <= Integer.parseInt(max); j++){
+                    str.append(j);
+                    str.append(",");
+                }
+            }
+            else {
+                str.append(words[i]);
+                str.append(",");
+            }
+        }
+        return str.toString();
+    }
 
     /**
      * @return the {@link PageRange} set for the given string, an empty set otherwise.
@@ -45,7 +69,11 @@ public final class ConversionUtils {
     public static Set<PageRange> toPageRangeSet(String selection) throws ConversionException {
         if (isNotBlank(selection)) {
             Set<PageRange> pageRangeSet = new NullSafeSet<>();
-            String[] tokens = splitAndTrim(selection, ",");
+            String selection2 = removeDash(selection);
+            if (selection2.endsWith(",")){
+                selection2 = selection2.substring(0, selection2.length() - 1);
+            }
+            String[] tokens = splitAndTrim(selection2, ",");
             for (String current : tokens) {
                 PageRange range = toPageRange(current);
                 if (range.getEnd() < range.getStart()) {
@@ -68,15 +96,15 @@ public final class ConversionUtils {
         }
         if (limits.length == 1) {
             int limitNumber = parsePageNumber(limits[0]);
-            if (value.endsWith("-")) {
+            if (value.endsWith("-")) { //[7-]
                 return new PageRange(limitNumber);
             }
-            if (value.startsWith("-")) {
+            if (value.startsWith("-")) { //[-7]
                 return new PageRange(1, limitNumber);
             }
             return new PageRange(limitNumber, limitNumber);
         }
-        return new PageRange(parsePageNumber(limits[0]), parsePageNumber(limits[1]));
+        return new PageRange(parsePageNumber(limits[0]), parsePageNumber(limits[1])); // [7-10]
     }
 
     private static int parsePageNumber(String value) throws ConversionException {
