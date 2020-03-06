@@ -19,6 +19,8 @@
 package org.pdfsam.merge;
 
 import java.util.Set;
+import java.util.Iterator;
+import java.util.Spliterator;
 
 import org.pdfsam.support.params.AbstractPdfOutputParametersBuilder;
 import org.pdfsam.support.params.SingleOutputTaskParametersBuilder;
@@ -28,7 +30,10 @@ import org.sejda.model.outline.OutlinePolicy;
 import org.sejda.model.output.FileTaskOutput;
 import org.sejda.model.parameter.MergeParameters;
 import org.sejda.model.pdf.form.AcroFormPolicy;
+import org.sejda.model.pdf.page.PageRange;
 import org.sejda.model.toc.ToCPolicy;
+
+import javax.print.attribute.standard.PageRanges;
 
 /**
  * Builder for {@link MergeParameters}
@@ -48,8 +53,24 @@ class MergeParametersBuilder extends AbstractPdfOutputParametersBuilder<MergePar
     private ToCPolicy tocPolicy = ToCPolicy.NONE;
     private FileTaskOutput output;
 
+    /** #ps-2: Implement function to extract page selection
+     *  for files in case they have more than one page range and sent them different file! */
     void addInput(PdfMergeInput input) {
-        this.inputs.add(input);
+        Set<PageRange> set = input.getPageSelection();
+        if(set.size() >= 2){
+            Iterator<PageRange> itr = set.iterator();
+            while(itr.hasNext())
+            {
+                PageRange range = itr.next();
+                Set<PageRange> rangeSet = new NullSafeSet<>();
+                rangeSet.add(range);
+
+                PdfMergeInput copyInput = new PdfMergeInput(input.getSource(), rangeSet);
+                this.inputs.add(copyInput);
+            }
+        }
+        else
+            this.inputs.add(input);
     }
 
     boolean hasInput() {

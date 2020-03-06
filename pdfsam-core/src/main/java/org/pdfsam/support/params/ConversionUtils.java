@@ -38,30 +38,6 @@ public final class ConversionUtils {
     private ConversionUtils() {
         // hide
     }
-/** Added by Fari for #ps-2*/
-    public static String removeDash(String selection){
-        StringBuilder str = new StringBuilder();
-        String[] words  = splitAndTrim(selection,",");
-
-        for(int i = 0; i<words.length; i++){
-            if(words[i].contains("-")){
-                int index = words[i].indexOf("-");
-                String min = words[i].substring(0,index);
-                String max = words[i].substring(index+1, words[i].length());
-                System.out.println(max);
-
-                for (int j= Integer.parseInt(min); j <= Integer.parseInt(max); j++){
-                    str.append(j);
-                    str.append(",");
-                }
-            }
-            else {
-                str.append(words[i]);
-                str.append(",");
-            }
-        }
-        return str.toString();
-    }
 
     /**
      * @return the {@link PageRange} set for the given string, an empty set otherwise.
@@ -69,11 +45,7 @@ public final class ConversionUtils {
     public static Set<PageRange> toPageRangeSet(String selection) throws ConversionException {
         if (isNotBlank(selection)) {
             Set<PageRange> pageRangeSet = new NullSafeSet<>();
-            String selection2 = removeDash(selection);
-            if (selection2.endsWith(",")){
-                selection2 = selection2.substring(0, selection2.length() - 1);
-            }
-            String[] tokens = splitAndTrim(selection2, ",");
+            String[] tokens = splitAndTrim(selection, ",");
             for (String current : tokens) {
                 PageRange range = toPageRange(current);
                 if (range.getEnd() < range.getStart()) {
