@@ -57,8 +57,9 @@ public class RotateSelectionPane extends MultipleSelectionPane
     @Override
     public void apply(RotateParametersBuilder builder, Consumer<String> onError) {
         try {
+            // modified lamba statement to pass total number of pages as part of ps3 change request
             table().getItems().stream().filter(s -> !Objects.equals("0", trim(s.pageSelection.get())))
-                    .forEach(i -> builder.addInput(i.descriptor().toPdfFileSource(), i.toPageRangeSet()));
+                    .forEach(i -> builder.addInput(i.descriptor().toPdfFileSource(), i.toPageRangeSet(), i.descriptor().pages().getValue()));
             if (!builder.hasInput()) {
                 onError.accept(DefaultI18nContext.getInstance().i18n("No PDF document has been selected"));
             }

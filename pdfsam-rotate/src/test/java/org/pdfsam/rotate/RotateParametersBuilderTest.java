@@ -66,7 +66,8 @@ public class RotateParametersBuilderTest {
         victim.output(output);
         File file = folder.newFile("my.pdf");
         PdfFileSource source = PdfFileSource.newInstanceNoPassword(file);
-        victim.addInput(source, null);
+        // added new parameter for ps3 change request
+        victim.addInput(source, null, 0);
         victim.version(PdfVersion.VERSION_1_7);
         BulkRotateParameters params = victim.build();
         assertTrue(params.isCompress());
@@ -88,7 +89,8 @@ public class RotateParametersBuilderTest {
         victim.output(output);
         File file = folder.newFile("my.pdf");
         PdfFileSource source = PdfFileSource.newInstanceNoPassword(file);
-        victim.addInput(source, Collections.singleton(new PageRange(2, 5)));
+        // added new parameter for ps3 change request
+        victim.addInput(source, Collections.singleton(new PageRange(2, 5)), 10);
         victim.version(PdfVersion.VERSION_1_7);
         BulkRotateParameters params = victim.build();
         Set<PdfRotationInput> inputs = params.getInputSet();
@@ -104,8 +106,9 @@ public class RotateParametersBuilderTest {
         victim.output(output);
         File file = folder.newFile("my.pdf");
         PdfFileSource source = PdfFileSource.newInstanceNoPassword(file);
-        victim.addInput(source, Collections.singleton(new PageRange(2, 5)));
-        victim.addInput(PdfFileSource.newInstanceNoPassword(file), Collections.emptySet());
+        // added new parameter for ps3 change request
+        victim.addInput(source, Collections.singleton(new PageRange(2, 5)), 10);
+        victim.addInput(PdfFileSource.newInstanceNoPassword(file), Collections.emptySet(), 0);
         BulkRotateParameters params = victim.build();
         Set<PdfRotationInput> inputs = params.getInputSet();
         assertEquals(2, inputs.size());

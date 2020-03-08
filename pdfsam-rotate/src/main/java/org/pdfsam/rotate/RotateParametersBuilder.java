@@ -20,7 +20,9 @@ package org.pdfsam.rotate;
 
 import static java.util.Objects.isNull;
 
+import java.util.HashSet;
 import java.util.Set;
+import java.util.Iterator;
 
 import org.pdfsam.support.params.AbstractPdfOutputParametersBuilder;
 import org.pdfsam.support.params.MultipleOutputTaskParametersBuilder;
@@ -48,11 +50,49 @@ class RotateParametersBuilder extends AbstractPdfOutputParametersBuilder<BulkRot
     private Rotation rotation;
     private PredefinedSetOfPages predefinedRotationType;
 
-    void addInput(PdfSource<?> source, Set<PageRange> pageSelection) {
+    void addInput(PdfSource<?> source, Set<PageRange> pageSelection, Integer totalPages) {
         if (isNull(pageSelection) || pageSelection.isEmpty()) {
             this.inputs.add(new PdfRotationInput(source, rotation, predefinedRotationType));
         } else {
-            this.inputs.add(new PdfRotationInput(source, rotation, pageSelection.stream().toArray(PageRange[]::new)));
+            //invoking a new method to filter out even/odd pages for custom page ranges - change request ps3
+            Set<PageRange> filteredPages = filterEvenOddPages(pageSelection, predefinedRotationType, totalPages);
+            this.inputs.add(new PdfRotationInput(source, rotation, filteredPages.stream().toArray(PageRange[]::new)));
+        }
+    }
+
+    protected Set<PageRange> filterEvenOddPages(Set<PageRange> pageSelection, PredefinedSetOfPages evenOddAll,
+                                      Integer lastPage){
+        //added  for ps3 to take a range of pages and remove the odd or even ones if EVEN_PAGES or ODD_PAGES selected
+        if (evenOddAll.name().equals("ALL_PAGES")) {
+            return pageSelection;
+        }
+        else {
+            //only need to alter and flatten page ranges if EVEN or ODD pages are specified
+            //This routine will alter 3-10 to 3,5,7,9 if ODD pages are selected
+            boolean even = evenOddAll.name().equals("EVEN_PAGES");
+            Set<PageRange> filteredPages = new HashSet<PageRange>();
+
+            Iterator<PageRange> it = pageSelection.iterator();
+            while (it.hasNext()) {
+                PageRange range = it.next();
+                if (range.getEnd() != range.getStart()) {
+                    int startPage = range.getStart();
+                    //if range is specified as "7-", set the endPage to the last page of document
+                    int endPage = (lastPage < range.getEnd()) ? lastPage : range.getEnd();
+                    for (int number = startPage; number <= endPage; number++) {
+                        //only add even or odd numbers back into page collection depending on which the user selected
+                        if (((number % 2) == 0 && even) ||
+                                ((number % 2) == 1 && !even)) {
+                            filteredPages.add(new PageRange(number, number));
+                        }
+                    }
+                }
+                else {
+                    //only a single page not a range of pages
+                    filteredPages.add(range);
+                }
+            }
+            return filteredPages;
         }
     }
 
