@@ -53,8 +53,9 @@ class MergeParametersBuilder extends AbstractPdfOutputParametersBuilder<MergePar
     private ToCPolicy tocPolicy = ToCPolicy.NONE;
     private FileTaskOutput output;
 
-    /** #ps-2: Implement function to extract page selection
-     *  for files in case they have more than one page range and sent them different file! */
+    /** ps-2: Implement a function to extract page selection
+     *  for each file in case it has more than one page range (e.g. 1-3,2-5) and
+     *  sent file with each page range separately! */
     void addInput(PdfMergeInput input) {
         Set<PageRange> set = input.getPageSelection();
         if(set.size() >= 2){
