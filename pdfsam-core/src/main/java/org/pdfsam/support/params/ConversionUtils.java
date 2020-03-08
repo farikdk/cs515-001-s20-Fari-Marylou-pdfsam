@@ -68,15 +68,15 @@ public final class ConversionUtils {
         }
         if (limits.length == 1) {
             int limitNumber = parsePageNumber(limits[0]);
-            if (value.endsWith("-")) {
+            if (value.endsWith("-")) { //[7-]
                 return new PageRange(limitNumber);
             }
-            if (value.startsWith("-")) {
+            if (value.startsWith("-")) { //[-7]
                 return new PageRange(1, limitNumber);
             }
             return new PageRange(limitNumber, limitNumber);
         }
-        return new PageRange(parsePageNumber(limits[0]), parsePageNumber(limits[1]));
+        return new PageRange(parsePageNumber(limits[0]), parsePageNumber(limits[1])); // [7-10]
     }
 
     private static int parsePageNumber(String value) throws ConversionException {
