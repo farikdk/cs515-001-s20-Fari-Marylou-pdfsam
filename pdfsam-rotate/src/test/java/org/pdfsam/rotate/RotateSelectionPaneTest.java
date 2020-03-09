@@ -75,7 +75,8 @@ public class RotateSelectionPaneTest {
     public void empty() {
         victim.apply(builder, onError);
         verify(onError).accept(anyString());
-        verify(builder, never()).addInput(any(), any());
+        // added new parameter for ps3 change request
+        verify(builder, never()).addInput(any(), any(), any());
     }
 
     @Test
@@ -85,7 +86,8 @@ public class RotateSelectionPaneTest {
         victim.apply(builder, onError);
         verify(onError, never()).accept(anyString());
         ArgumentCaptor<Set> ranges = ArgumentCaptor.forClass(Set.class);
-        verify(builder).addInput(any(), ranges.capture());
+        // added new parameter for ps3 change request
+        verify(builder).addInput(any(), ranges.capture(), any());
         assertTrue(ranges.getValue().isEmpty());
     }
 
@@ -97,16 +99,19 @@ public class RotateSelectionPaneTest {
         victim.apply(builder, onError);
         verify(onError, never()).accept(anyString());
         ArgumentCaptor<Set> ranges = ArgumentCaptor.forClass(Set.class);
-        verify(builder).addInput(any(), ranges.capture());
+        // added new parameter for ps3 change request
+        verify(builder).addInput(any(), ranges.capture(), any());
         assertEquals(2, ranges.getValue().size());
     }
 
     @Test
     public void converstionException() throws Exception {
         populate();
-        doThrow(new ConversionException("message")).when(builder).addInput(any(), any());
+        // added new parameter for ps3 change request
+        doThrow(new ConversionException("message")).when(builder).addInput(any(), any(), any());
         victim.apply(builder, onError);
-        verify(builder).addInput(any(), any());
+        // added new parameter for ps3 change request
+        verify(builder).addInput(any(), any(), any());
         verify(onError).accept(eq("message"));
     }
 
@@ -116,7 +121,8 @@ public class RotateSelectionPaneTest {
         victim.table().getItems().get(0).pageSelection.set("0");
         victim.apply(builder, onError);
         verify(onError).accept(anyString());
-        verify(builder, never()).addInput(any(), any());
+        // added new parameter for ps3 change request
+        verify(builder, never()).addInput(any(), any(), any());
     }
 
     private void populate() throws Exception {
