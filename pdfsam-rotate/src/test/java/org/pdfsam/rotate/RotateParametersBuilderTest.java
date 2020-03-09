@@ -67,7 +67,7 @@ public class RotateParametersBuilderTest {
         File file = folder.newFile("my.pdf");
         PdfFileSource source = PdfFileSource.newInstanceNoPassword(file);
         // added new parameter for ps3 change request
-        victim.addInput(source, null, 0);
+        victim.addInput(source, null, 5);
         victim.version(PdfVersion.VERSION_1_7);
         BulkRotateParameters params = victim.build();
         assertTrue(params.isCompress());
@@ -90,14 +90,16 @@ public class RotateParametersBuilderTest {
         File file = folder.newFile("my.pdf");
         PdfFileSource source = PdfFileSource.newInstanceNoPassword(file);
         // added new parameter for ps3 change request
-        victim.addInput(source, Collections.singleton(new PageRange(2, 5)), 10);
+        victim.addInput(source, Collections.singleton(new PageRange(2, 5)), 5);
         victim.version(PdfVersion.VERSION_1_7);
         BulkRotateParameters params = victim.build();
         Set<PdfRotationInput> inputs = params.getInputSet();
         assertEquals(1, inputs.size());
         PdfRotationInput input = inputs.iterator().next();
         assertEquals(Rotation.DEGREES_180, input.rotation);
-        assertEquals(4, input.getPages(5).size());
+        //since ODD_PAGES are now getting filtered after fixing ps3, this only produces 2 pages of output
+        assertEquals(2, input.getPages(5).size());
+        //assertEquals(4, input.getPages(5).size());
     }
 
     @Test
@@ -107,7 +109,7 @@ public class RotateParametersBuilderTest {
         File file = folder.newFile("my.pdf");
         PdfFileSource source = PdfFileSource.newInstanceNoPassword(file);
         // added new parameter for ps3 change request
-        victim.addInput(source, Collections.singleton(new PageRange(2, 5)), 10);
+        victim.addInput(source, Collections.singleton(new PageRange(2, 5)), 5);
         victim.addInput(PdfFileSource.newInstanceNoPassword(file), Collections.emptySet(), 0);
         BulkRotateParameters params = victim.build();
         Set<PdfRotationInput> inputs = params.getInputSet();

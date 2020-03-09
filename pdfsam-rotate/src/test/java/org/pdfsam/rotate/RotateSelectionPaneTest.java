@@ -76,7 +76,7 @@ public class RotateSelectionPaneTest {
         victim.apply(builder, onError);
         verify(onError).accept(anyString());
         // added new parameter for ps3 change request
-        verify(builder, never()).addInput(any(), any(), 0);
+        verify(builder, never()).addInput(any(), any(), any());
     }
 
     @Test
@@ -87,7 +87,7 @@ public class RotateSelectionPaneTest {
         verify(onError, never()).accept(anyString());
         ArgumentCaptor<Set> ranges = ArgumentCaptor.forClass(Set.class);
         // added new parameter for ps3 change request
-        verify(builder).addInput(any(), ranges.capture(), 0);
+        verify(builder).addInput(any(), ranges.capture(), any());
         assertTrue(ranges.getValue().isEmpty());
     }
 
@@ -100,7 +100,7 @@ public class RotateSelectionPaneTest {
         verify(onError, never()).accept(anyString());
         ArgumentCaptor<Set> ranges = ArgumentCaptor.forClass(Set.class);
         // added new parameter for ps3 change request
-        verify(builder).addInput(any(), ranges.capture(), 10);
+        verify(builder).addInput(any(), ranges.capture(), any());
         assertEquals(2, ranges.getValue().size());
     }
 
@@ -108,10 +108,10 @@ public class RotateSelectionPaneTest {
     public void converstionException() throws Exception {
         populate();
         // added new parameter for ps3 change request
-        doThrow(new ConversionException("message")).when(builder).addInput(any(), any(), 0);
+        doThrow(new ConversionException("message")).when(builder).addInput(any(), any(), any());
         victim.apply(builder, onError);
         // added new parameter for ps3 change request
-        verify(builder).addInput(any(), any(), 0);
+        verify(builder).addInput(any(), any(), any());
         verify(onError).accept(eq("message"));
     }
 
@@ -122,7 +122,7 @@ public class RotateSelectionPaneTest {
         victim.apply(builder, onError);
         verify(onError).accept(anyString());
         // added new parameter for ps3 change request
-        verify(builder, never()).addInput(any(), any(), 0);
+        verify(builder, never()).addInput(any(), any(), any());
     }
 
     private void populate() throws Exception {
