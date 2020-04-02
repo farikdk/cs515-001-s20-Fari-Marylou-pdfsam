@@ -88,7 +88,7 @@ public class PdfLoadControllerTest {
         PdfFilesListLoadRequest event = new PdfFilesListLoadRequest(DefaultPriorityTestModule.ID, list);
         Listener<PdfLoadRequestEvent> listener = mock(Listener.class);
         eventStudio().add(PdfLoadRequestEvent.class, listener, DefaultPriorityTestModule.ID);
-        victim.request(event);
+        event.request(victim);
         verify(listener, after(1000).never()).onEvent(any());
     }
 
@@ -102,7 +102,7 @@ public class PdfLoadControllerTest {
         PdfFilesListLoadRequest event = new PdfFilesListLoadRequest(DefaultPriorityTestModule.ID, list);
         Listener<PdfLoadRequestEvent> listener = mock(Listener.class);
         eventStudio().add(PdfLoadRequestEvent.class, listener, DefaultPriorityTestModule.ID);
-        victim.request(event);
+        event.request(victim);
         ArgumentCaptor<PdfLoadRequestEvent> captor = ArgumentCaptor.forClass(PdfLoadRequestEvent.class);
         verify(listener, timeout(60000).times(1)).onEvent(captor.capture());
         assertEquals(1, captor.getValue().getDocuments().size());

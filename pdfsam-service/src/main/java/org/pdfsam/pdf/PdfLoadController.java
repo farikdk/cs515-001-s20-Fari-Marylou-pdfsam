@@ -18,7 +18,6 @@
  */
 package org.pdfsam.pdf;
 
-import static java.util.Objects.nonNull;
 import static org.sejda.eventstudio.StaticStudio.eventStudio;
 
 import java.util.HashMap;
@@ -30,13 +29,13 @@ import java.util.concurrent.Executors;
 import javax.inject.Inject;
 
 import org.pdfsam.ShutdownEvent;
-import org.pdfsam.i18n.DefaultI18nContext;
 import org.pdfsam.module.Module;
 import org.pdfsam.module.RequiredPdfData;
 import org.sejda.eventstudio.annotation.EventListener;
 import org.sejda.injector.Auto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 
 /**
  * Component listening for {@link PdfLoadRequestEvent}, triggering the actual pdf load and sending out a response with the result of the loading
@@ -47,10 +46,10 @@ import org.slf4j.LoggerFactory;
 @Auto
 public class PdfLoadController {
 
-    private static final Logger LOG = LoggerFactory.getLogger(PdfLoadController.class);
+    protected static final Logger LOG = LoggerFactory.getLogger(PdfLoadController.class);
 
     private PdfLoadService loadService;
-    private ExecutorService executor = Executors.newSingleThreadExecutor();
+    protected  ExecutorService executor = Executors.newSingleThreadExecutor();
     private Map<String, RequiredPdfData[]> requiredLoadData = new HashMap<>();
 
     @Inject
@@ -70,34 +69,6 @@ public class PdfLoadController {
         LOG.trace("PDF load request received");
         event.getDocuments().forEach(i -> i.moveStatusTo(PdfDescriptorLoadingStatus.REQUESTED));
         executor.execute(() -> loadService.load(event.getDocuments(), requiredLoadData.get(event.getOwnerModule())));
-    }
-
-    /**
-     * Request to load a text/csv file containing a list of PDF
-     * 
-     * @param event
-     */
-    @EventListener
-    public void request(PdfFilesListLoadRequest event) {
-        LOG.trace("PDF load from list request received");
-        if (nonNull(event.list)) {
-            executor.execute(() -> {
-                try {
-                    PdfLoadRequestEvent loadEvent = new PdfLoadRequestEvent(event.getOwnerModule());
-                    new PdfListParser().apply(event.list).stream().map(PdfDocumentDescriptor::newDescriptorNoPassword)
-                            .forEach(loadEvent::add);
-                    if (loadEvent.getDocuments().isEmpty()) {
-                        LOG.error(DefaultI18nContext.getInstance()
-                                .i18n("Unable to find any valid PDF file in the list: {0}", event.list.toString()));
-                    } else {
-                        eventStudio().broadcast(loadEvent, event.getOwnerModule());
-                    }
-                } catch (Exception e) {
-                    LOG.error(DefaultI18nContext.getInstance().i18n("Unable to load PDF list file from {0}",
-                            event.list.toString()), e);
-                }
-            });
-        }
     }
 
     @EventListener
