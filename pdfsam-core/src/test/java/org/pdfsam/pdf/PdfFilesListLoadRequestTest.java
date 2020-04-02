@@ -24,12 +24,34 @@ import java.nio.file.Path;
 
 import org.junit.Test;
 import org.pdfsam.pdf.PdfFilesListLoadRequest;
+import org.pdfsam.test.DefaultPriorityTestModule;
+import org.junit.Rule;
+import org.junit.Before;
+import java.util.Arrays;
+import org.pdfsam.test.DefaultPriorityTestModule;
+import static org.mockito.Mockito.timeout;
+import static org.mockito.Mockito.verify;
+import org.pdfsam.module.RequiredPdfData;
+import static org.mockito.ArgumentMatchers.anyCollection;
+import static org.mockito.ArgumentMatchers.eq;
+
 
 /**
  * @author Andrea Vacondio
  *
  */
 public class PdfFilesListLoadRequestTest {
+
+    @Rule
+//    public ClearEventStudioRule clearStudio = new ClearEventStudioRule();
+    private PdfLoadService loadService;
+    private PdfLoadController victim;
+
+    @Before
+    public void setUp() {
+        loadService = mock(PdfLoadService.class);
+    }
+
     @Test(expected = IllegalArgumentException.class)
     public void nullFile() {
         new PdfFilesListLoadRequest("module", null);
@@ -43,5 +65,19 @@ public class PdfFilesListLoadRequestTest {
     @Test
     public void valid() {
         new PdfFilesListLoadRequest("module", mock(Path.class));
+    }
+
+    @Test
+    public void request(){
+        PdfLoadRequestEvent event = new PdfLoadRequestEvent(DefaultPriorityTestModule.ID);
+        PdfDocumentDescriptor first = mock(PdfDocumentDescriptor.class);
+        PdfDocumentDescriptor second = mock(PdfDocumentDescriptor.class);
+        event.add(first);
+        event.add(second);
+        victim.request(event);
+        verify(first).moveStatusTo(PdfDescriptorLoadingStatus.REQUESTED);
+        verify(second).moveStatusTo(PdfDescriptorLoadingStatus.REQUESTED);
+        verify(loadService, timeout(1000).times(1)).load(anyCollection(), eq(RequiredPdfData.DEFAULT));
+
     }
 }
