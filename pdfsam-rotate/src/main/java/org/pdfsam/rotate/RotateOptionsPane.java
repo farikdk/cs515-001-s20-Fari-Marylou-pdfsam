@@ -53,9 +53,9 @@ class RotateOptionsPane extends HBox
     private static final String ANGLE_ID = "rotation";
     private static final String PAGES_ID = "rotationType";
 
-    public String getPagesId() {return this.PAGES_ID;}
+    public static String getPagesId() {return PAGES_ID;}
 
-    public String getAngleId() {return this.ANGLE_ID;}
+    public static String getAngleId() {return ANGLE_ID;}
 
     RotateOptionsPane() {
         super(Style.DEFAULT_SPACING);
