@@ -68,6 +68,12 @@
 			<artifactId>javafx-swing</artifactId>
 			<scope>test</scope>
 		</dependency>
+        <dependency>
+            <groupId>org.pdfsam</groupId>
+            <artifactId>pdfsam-service</artifactId>
+            <version>4.0.5</version>
+            <scope>compile</scope>
+        </dependency>
 
-	</dependencies>
+    </dependencies>
 </project>
