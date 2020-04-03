@@ -37,7 +37,7 @@ import org.apache.commons.lang3.StringUtils;
  * @author Andrea Vacondio
  *
  */
-class PdfListParser implements Function<Path, List<File>> {
+public class PdfListParser implements Function<Path, List<File>> {
     /**
      * Given a Path to text/csv file, it parses is returning a list of PDF files contained in the parsed file
      * 

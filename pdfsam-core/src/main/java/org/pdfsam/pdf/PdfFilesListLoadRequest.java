@@ -24,11 +24,15 @@ import static org.pdfsam.support.RequireUtils.requireNotNull;
 import static org.sejda.eventstudio.StaticStudio.eventStudio;
 
 import java.nio.file.Path;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.pdfsam.i18n.DefaultI18nContext;
 import org.pdfsam.module.ModuleOwned;
 import org.sejda.eventstudio.annotation.EventListener;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Andrea Vacondio
@@ -37,6 +41,8 @@ import org.sejda.eventstudio.annotation.EventListener;
 public class PdfFilesListLoadRequest implements ModuleOwned {
     public final Path list;
     private String ownerModule = StringUtils.EMPTY;
+    private static final Logger LOG = LoggerFactory.getLogger(PdfFilesListLoadRequest.class);
+    private ExecutorService executor = Executors.newSingleThreadExecutor();
 
     public PdfFilesListLoadRequest(String ownerModule, Path list) {
         requireNotBlank(ownerModule, "Owner module cannot be blank");
@@ -53,25 +59,24 @@ public class PdfFilesListLoadRequest implements ModuleOwned {
     /**
      * Request to load a text/csv file containing a list of PDF
      *
-     * @param pdfLoadController
      */
     @EventListener
-    public void request(PdfLoadController pdfLoadController) {
-        PdfLoadController.LOG.trace("PDF load from list request received");
+    public void request() {
+        LOG.trace("PDF load from list request received");
         if (nonNull(list)) {
-            pdfLoadController.executor.execute(() -> {
+            executor.execute(() -> {
                 try {
                     PdfLoadRequestEvent loadEvent = new PdfLoadRequestEvent(getOwnerModule());
                     new PdfListParser().apply(list).stream().map(PdfDocumentDescriptor::newDescriptorNoPassword)
                             .forEach(loadEvent::add);
                     if (loadEvent.getDocuments().isEmpty()) {
-                        PdfLoadController.LOG.error(DefaultI18nContext.getInstance()
+                        LOG.error(DefaultI18nContext.getInstance()
                                 .i18n("Unable to find any valid PDF file in the list: {0}", list.toString()));
                     } else {
                         eventStudio().broadcast(loadEvent, getOwnerModule());
                     }
                 } catch (Exception e) {
-                    PdfLoadController.LOG.error(DefaultI18nContext.getInstance().i18n("Unable to load PDF list file from {0}",
+                    LOG.error(DefaultI18nContext.getInstance().i18n("Unable to load PDF list file from {0}",
                             list.toString()), e);
                 }
             });

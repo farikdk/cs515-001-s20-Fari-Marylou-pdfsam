@@ -46,10 +46,10 @@ import org.slf4j.LoggerFactory;
 @Auto
 public class PdfLoadController {
 
-    protected static final Logger LOG = LoggerFactory.getLogger(PdfLoadController.class);
+    private static final Logger LOG = LoggerFactory.getLogger(PdfLoadController.class);
 
     private PdfLoadService loadService;
-    protected  ExecutorService executor = Executors.newSingleThreadExecutor();
+    private  ExecutorService executor = Executors.newSingleThreadExecutor();
     private Map<String, RequiredPdfData[]> requiredLoadData = new HashMap<>();
 
     @Inject
