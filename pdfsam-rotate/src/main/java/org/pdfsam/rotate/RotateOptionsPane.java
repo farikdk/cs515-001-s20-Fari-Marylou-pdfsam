@@ -50,6 +50,12 @@ class RotateOptionsPane extends HBox
 
     private ComboBox<KeyStringValueItem<PredefinedSetOfPages>> rotationType = new ComboBox<>();
     private ComboBox<KeyStringValueItem<Rotation>> rotation = new ComboBox<>();
+    private static final String ANGLE_ID = "rotation";
+    private static final String PAGES_ID = "rotationType";
+
+    public static String getPagesId() {return PAGES_ID;}
+
+    public static String getAngleId() {return ANGLE_ID;}
 
     RotateOptionsPane() {
         super(Style.DEFAULT_SPACING);
@@ -59,7 +65,7 @@ class RotateOptionsPane extends HBox
                 .add(keyValue(PredefinedSetOfPages.EVEN_PAGES, DefaultI18nContext.getInstance().i18n("Even pages")));
         this.rotationType.getItems()
                 .add(keyValue(PredefinedSetOfPages.ODD_PAGES, DefaultI18nContext.getInstance().i18n("Odd pages")));
-        this.rotationType.setId("rotationType");
+        this.rotationType.setId(PAGES_ID);
 
         this.rotation.getItems()
                 .add(keyValue(Rotation.DEGREES_90, DefaultI18nContext.getInstance().i18n("90 degrees clockwise")));
@@ -67,7 +73,7 @@ class RotateOptionsPane extends HBox
                 .add(keyValue(Rotation.DEGREES_180, DefaultI18nContext.getInstance().i18n("180 degrees clockwise")));
         this.rotation.getItems().add(
                 keyValue(Rotation.DEGREES_270, DefaultI18nContext.getInstance().i18n("90 degrees counterclockwise")));
-        this.rotation.setId("rotation");
+        this.rotation.setId(ANGLE_ID);
 
         getStyleClass().addAll(Style.HCONTAINER.css());
         getStyleClass().addAll(Style.CONTAINER.css());
@@ -90,17 +96,17 @@ class RotateOptionsPane extends HBox
 
     @Override
     public void saveStateTo(Map<String, String> data) {
-        data.put("rotation", Optional.ofNullable(rotation.getSelectionModel().getSelectedItem())
+        data.put(ANGLE_ID, Optional.ofNullable(rotation.getSelectionModel().getSelectedItem())
                 .map(i -> i.getKey().toString()).orElse(EMPTY));
-        data.put("rotationType", Optional.ofNullable(rotationType.getSelectionModel().getSelectedItem())
+        data.put(PAGES_ID, Optional.ofNullable(rotationType.getSelectionModel().getSelectedItem())
                 .map(i -> i.getKey().toString()).orElse(EMPTY));
     }
 
     @Override
     public void restoreStateFrom(Map<String, String> data) {
-        Optional.ofNullable(data.get("rotation")).map(Rotation::valueOf).map(r -> keyEmptyValue(r))
+        Optional.ofNullable(data.get(ANGLE_ID)).map(Rotation::valueOf).map(r -> keyEmptyValue(r))
                 .ifPresent(r -> this.rotation.getSelectionModel().select(r));
-        Optional.ofNullable(data.get("rotationType")).map(PredefinedSetOfPages::valueOf).map(r -> keyEmptyValue(r))
+        Optional.ofNullable(data.get(PAGES_ID)).map(PredefinedSetOfPages::valueOf).map(r -> keyEmptyValue(r))
                 .ifPresent(r -> this.rotationType.getSelectionModel().select(r));
     }
 }
