@@ -79,13 +79,13 @@ class RotateParametersBuilder extends AbstractPdfOutputParametersBuilder<BulkRot
 
         Iterator<PageRange> it = pageSelection.iterator();
         while (it.hasNext()) {
-            extractPageRange(lastPage, even, filteredPages, it);
+            PageRange range = it.next();
+            extractPageRange(lastPage, even, filteredPages, range);
         }
         return filteredPages;
     }
 
-    private void extractPageRange(Integer lastPage, boolean even, Set<PageRange> filteredPages, Iterator<PageRange> it) {
-        PageRange range = it.next();
+    private void extractPageRange(Integer lastPage, boolean even, Set<PageRange> filteredPages, PageRange range) {
         if (range.getEnd() != range.getStart()) {
             int startPage = range.getStart();
             //if range is specified as "7-", set the endPage to the last page of document
