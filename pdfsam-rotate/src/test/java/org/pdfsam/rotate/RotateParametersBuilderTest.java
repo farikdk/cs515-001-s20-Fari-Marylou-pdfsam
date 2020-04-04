@@ -49,6 +49,7 @@ public class RotateParametersBuilderTest {
     @Rule
     public TemporaryFolder folder = new TemporaryFolder();
     private RotateParametersBuilder victim;
+//    private PredefinedSetOfPages predefinedSetOfPages;
 
     @Before
     public void setUp() {
@@ -114,5 +115,43 @@ public class RotateParametersBuilderTest {
         BulkRotateParameters params = victim.build();
         Set<PdfRotationInput> inputs = params.getInputSet();
         assertEquals(2, inputs.size());
+    }
+
+    /** Rotate All Pages*/
+    @Test
+    public void filterEvenOddPages() throws Exception{
+        victim.rotationType(PredefinedSetOfPages.ALL_PAGES);
+        FileOrDirectoryTaskOutput output = mock(FileOrDirectoryTaskOutput.class);
+        victim.output(output);
+        File file = folder.newFile("my.pdf");
+        PdfFileSource source = PdfFileSource.newInstanceNoPassword(file);
+        // added new parameter for ps3 change request
+        victim.addInput(source, null, 5);
+        victim.version(PdfVersion.VERSION_1_7);
+        BulkRotateParameters params = victim.build();
+        Set<PdfRotationInput> inputs = params.getInputSet();
+        PdfRotationInput input = inputs.iterator().next();
+
+        /** Rotate All Pages*/
+        assertEquals(5, input.getPages(5).size());
+    }
+
+    /** Rotate Even Pages*/
+    @Test
+    public void filterEvenPages() throws Exception{
+        victim.rotationType(PredefinedSetOfPages.EVEN_PAGES);
+        FileOrDirectoryTaskOutput output = mock(FileOrDirectoryTaskOutput.class);
+        victim.output(output);
+        File file = folder.newFile("my.pdf");
+        PdfFileSource source = PdfFileSource.newInstanceNoPassword(file);
+        // added new parameter for ps3 change request
+        victim.addInput(source, null, 10);
+        victim.version(PdfVersion.VERSION_1_7);
+        BulkRotateParameters params = victim.build();
+        Set<PdfRotationInput> inputs = params.getInputSet();
+        PdfRotationInput input = inputs.iterator().next();
+
+        /** Rotate Even Pages*/
+        assertEquals(5, input.getPages(10).size());
     }
 }

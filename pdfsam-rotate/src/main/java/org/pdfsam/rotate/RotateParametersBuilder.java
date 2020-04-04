@@ -69,30 +69,38 @@ class RotateParametersBuilder extends AbstractPdfOutputParametersBuilder<BulkRot
         else {
             //only need to alter and flatten page ranges if EVEN or ODD pages are specified
             //This routine will alter 3-10 to 3,5,7,9 if ODD pages are selected
-            boolean even = evenOddAll.name().equals("EVEN_PAGES");
-            Set<PageRange> filteredPages = new HashSet<PageRange>();
+            return filteredPaged(pageSelection, evenOddAll, lastPage);
+        }
+    }
 
-            Iterator<PageRange> it = pageSelection.iterator();
-            while (it.hasNext()) {
-                PageRange range = it.next();
-                if (range.getEnd() != range.getStart()) {
-                    int startPage = range.getStart();
-                    //if range is specified as "7-", set the endPage to the last page of document
-                    int endPage = (lastPage < range.getEnd()) ? lastPage : range.getEnd();
-                    for (int number = startPage; number <= endPage; number++) {
-                        //only add even or odd numbers back into page collection depending on which the user selected
-                        if (((number % 2) == 0 && even) ||
-                                ((number % 2) == 1 && !even)) {
-                            filteredPages.add(new PageRange(number, number));
-                        }
-                    }
-                }
-                else {
-                    //only a single page not a range of pages
-                    filteredPages.add(range);
+    private Set<PageRange> filteredPaged(Set<PageRange> pageSelection, PredefinedSetOfPages evenOddAll, Integer lastPage) {
+        boolean even = evenOddAll.name().equals("EVEN_PAGES");
+        Set<PageRange> filteredPages = new HashSet<PageRange>();
+
+        Iterator<PageRange> it = pageSelection.iterator();
+        while (it.hasNext()) {
+            PageRange range = it.next();
+            extractPageRange(lastPage, even, filteredPages, range);
+        }
+        return filteredPages;
+    }
+
+    private void extractPageRange(Integer lastPage, boolean even, Set<PageRange> filteredPages, PageRange range) {
+        if (range.getEnd() != range.getStart()) {
+            int startPage = range.getStart();
+            //if range is specified as "7-", set the endPage to the last page of document
+            int endPage = (lastPage < range.getEnd()) ? lastPage : range.getEnd();
+            for (int number = startPage; number <= endPage; number++) {
+                //only add even or odd numbers back into page collection depending on which the user selected
+                if (((number % 2) == 0 && even) ||
+                        ((number % 2) == 1 && !even)) {
+                    filteredPages.add(new PageRange(number, number));
                 }
             }
-            return filteredPages;
+        }
+        else {
+            //only a single page not a range of pages
+            filteredPages.add(range);
         }
     }
 
